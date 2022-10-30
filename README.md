@@ -13,6 +13,7 @@ A Raspberry Pi will be used to monitor the pressure plate and send logs to S3 wh
 ## Raspberry Pi Setup
 
 ![Raspberry Pi circuit diagram](./images/Raspberry-Pi-Pressure-Pad-Resistor.png.webp)
+
 The Raspberry Pi is constantly monitoring the state of the pressure plate. When pressed, the RPi will log the starting timestamp. Once the plate is let go, the RPi will log the ending timestamp and send these two values in the form of a JSON file to S3. Example: `{"start_ts": "2022-10-29 23:48:53.957035", "end_ts": "2022-10-29 23:53:09.575207"}`
 
 These two data points are enough to answer concerning questions such as
