@@ -23,3 +23,39 @@ These two data points are enough to answer concerning questions such as
 - What hours of the day are these sessions typically occurring?
 - Does a particular session deviate from typical behavior?
 - What is typical behavior?
+
+## Athena
+
+The beauty of Amazon Athena is that it allows you to directly query S3 with little to no ETL. In this case, no ETL is required. We can immediately build the table and start querying.
+
+To contstruct the table we execute
+
+```
+CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`pp` (
+  `start_ts` timestamp,
+  `end_ts` timestamp
+)
+ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
+WITH SERDEPROPERTIES (
+  'ignore.malformed.json' = 'FALSE',
+  'dots.in.keys' = 'FALSE',
+  'case.insensitive' = 'TRUE',
+  'mapping' = 'TRUE'
+)
+STORED AS INPUTFORMAT 'org.apache.hadoop.mapred.TextInputFormat' OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION 's3://<bucke name>/'
+TBLPROPERTIES ('classification' = 'json');
+```
+
+Now we can query and answer all our questions!
+
+```
+select
+    date(start_ts) as day,
+    extract(hour from start_ts) as hour_of_day,
+    start_ts,
+    end_ts,
+    date_diff('minute', start_ts,end_ts) as duration_mins,
+    date_diff('second', start_ts,end_ts) as duration_secs
+from presure_plate_logs
+```
